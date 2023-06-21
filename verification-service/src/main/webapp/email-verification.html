@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Email Verification Service</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script lang="javascript">
+		function verifyToken(tokenValue) {
+			$.ajax({
+			    data: { token: tokenValue },
+			    method: 'PATCH',
+			    headers: {
+			    	Accept: 'application/json'
+			    },
+			    url: 'http://localhost:8888/mobile-app-ws/users/email-verification',
+			    success: function(response) {
+			    	if(response['operationResult'] == 'SUCCESS') {
+						$('#successful-result').attr('style', 'display: block;');
+						$('#not-successful-result').attr('style', 'display: none;');
+					}
+					else {
+						$('#not-successful-result').attr('style', 'display: block;');
+						$('#successful-result').attr('style', 'display: none;');
+					}
+			    }
+			});
+		}
+		$(document).ready(function() {
+			const urlParams = new URLSearchParams(location.search);
+			const token = urlParams.get('token');
+			if(!token || token.trim() == '') {
+				alert('Missing the required token');
+				return;
+			}
+			verifyToken(token);
+		});
+	</script>
+</head>
+<body>
+	<div id="successful-result" style="display: none">Successful verification</div>
+	<div id="not-successful-result" style="display: none">Verification link has expired</div>
+</body>
+</html>

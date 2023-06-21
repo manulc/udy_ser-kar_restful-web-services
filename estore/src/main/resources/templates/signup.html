@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8">
+		<title>Sign up form</title>
+	</head>
+	<body>
+		<form action="/signup" method="post">
+			<div><input name="firstName" placeholder="First name"></div>
+			<div><input name="lastName" placeholder="Last name"></div>
+			<div><input name="email" placeholder="Email" type="email"></div>
+			<div><input name="password" placeholder="Password" type="password"></div>
+			<div><input name="repeatPassword" placeholder="Repeat password" type="password"></div>
+			<div><input type="submit" value="Sign up"></div>
+		</form>
+	</body>
+</html>
