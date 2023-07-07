@@ -24,7 +24,6 @@ class UtilsTest {
 	void testGenerateId() {
 		String userId1 = utils.generateId(30);
 		String userId2 = utils.generateId(30);
-		
 		assertNotNull(userId1);
 		assertTrue(userId1.length() == 30);
 		assertNotNull(userId2);
@@ -43,5 +42,4 @@ class UtilsTest {
 		String expiredToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MUB0ZXN0LmNvbSIsImV4cCI6MTUzMjc3Nzc3NX0.cdudUo3pwZLN9UiTuXiT7itpaQs6BgUPU0yWbNcz56-l1Z0476N3H_qSEHXQI5lUfaK2ePtTWJfROmf0213UJA";
 		assertTrue(utils.hasTokenExpired(expiredToken));
 	}
-
 }

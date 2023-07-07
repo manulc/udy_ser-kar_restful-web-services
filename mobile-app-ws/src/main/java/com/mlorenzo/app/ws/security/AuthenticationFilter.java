@@ -2,6 +2,7 @@ package com.mlorenzo.app.ws.security;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 
 import javax.servlet.FilterChain;
@@ -18,8 +19,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mlorenzo.app.ws.SpringApplicationContext;
 import com.mlorenzo.app.ws.services.UserService;
-import com.mlorenzo.app.ws.shared.dtos.UserDto;
 import com.mlorenzo.app.ws.ui.models.requests.UserLoginRequestModel;
+import com.mlorenzo.app.ws.ui.models.responses.UserRest;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -39,7 +40,6 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 			throws AuthenticationException {
 		try {
 			UserLoginRequestModel creds = new ObjectMapper().readValue(request.getInputStream(), UserLoginRequestModel.class);
-			
 			// Aquí se ejecutará por detrás nuestra implementación del método "loadUserByUsername" de Spring Security que se encuentra en la clase UserServiceImpl
 			// Dicha implementación localizará los datos del usuario en la base de datos, a partir del email y la password que se pasan aquí, y si se localiza, la autenticación es correcta
 			return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(creds.getEmail(), creds.getPassword(), new ArrayList<>()));
@@ -55,24 +55,16 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 			Authentication authResult) throws IOException, ServletException {
 		// En nuestro caso, Principal es el email del usuario
 		String username = ((UserPrincipal)authResult.getPrincipal()).getUsername();
-
 		String token = Jwts.builder()
 				.setSubject(username) // En nuestro caso es el email
 				.setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
-				.signWith(SignatureAlgorithm.HS512, SecurityConstants.getTokenSecret())
+				.signWith(SignatureAlgorithm.HS512, Base64.getEncoder().encode(SecurityConstants.getTokenSecret().getBytes()))
 				.compact();
-		
 		// Tenemos que obtener de esta forma el bean de Spring "userServiceImpl" porque esta clase no es un
 		// componente de Spring y, por lo tanto, no podemos usar la inyección directa de Spring.
 		UserService userService = (UserService)SpringApplicationContext.getBean("userServiceImpl");
-		
-		UserDto userDto = userService.getUser(username); // username es el email del usuario
-		
+		UserRest userRest = userService.getUser(username); // username es el email del usuario
 		response.addHeader(SecurityConstants.HEADER_STRING, String.format("%s%s", SecurityConstants.TOKEN_PREFIX,token));
-		response.addHeader("UserId", userDto.getUserId());
+		response.addHeader("UserId", userRest.getUserId());
 	}
-	
-	
-	
-	
 }

@@ -37,5 +37,4 @@ public class MobileAppWsApplication extends SpringBootServletInitializer {
 	public ModelMapper modelMapper() {
 		return new ModelMapper();
 	}
-
 }

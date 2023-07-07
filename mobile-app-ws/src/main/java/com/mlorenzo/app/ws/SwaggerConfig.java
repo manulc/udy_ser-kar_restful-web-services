@@ -17,9 +17,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 @Configuration
 public class SwaggerConfig {
-	
 	private Contact contact = new Contact("Manuel Lorenzo", "http://www.test.com", "test@test.com");
-	
 	private ApiInfo apiInfo = new ApiInfo("Photo app RESTful Web Service documentation",
 			"This pages documents Photo app RESTful Web Service endpoints", "1.0",
 			"http://test.com/service.html", contact, "Apache 2.0",
@@ -34,8 +32,6 @@ public class SwaggerConfig {
 				.apis(RequestHandlerSelectors.basePackage("com.mlorenzo.app.ws"))
 				.paths(PathSelectors.any())
 				.build();
-		
 		return docket;
 	}
-
 }

@@ -21,8 +21,8 @@ public class AuthenticationController {
 	@ApiOperation("User login")
     @ApiResponses(value = {
     		@ApiResponse(code = 200, message = "Response Headers", responseHeaders = {
-                @ResponseHeader(name = "authorization", description = "Bearer <JWT value here>", response = String.class),
-                @ResponseHeader(name = "userId", description = "<Public User Id value here>", response = String.class)
+                @ResponseHeader(name = "authorization", description = "Bearer --JWT value here--", response = String.class),
+                @ResponseHeader(name = "userId", description = "--Public User Id value here--;", response = String.class)
             }),
     		@ApiResponse(code = 401, message = "Invalid Credentials")
     })
@@ -30,5 +30,4 @@ public class AuthenticationController {
 	public void theFakeLogin(@RequestBody UserLoginRequestModel userLoginRequestModel) {
 		throw new IllegalStateException("This method should not be called. This method is implemented by Spring Security");
 	}
-
 }

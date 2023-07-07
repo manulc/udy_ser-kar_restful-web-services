@@ -13,7 +13,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "addresses")
 public class AddressEntity implements Serializable {
-
 	private static final long serialVersionUID = -3467069727965249126L;
 	
 	@Id

@@ -2,7 +2,6 @@ package com.mlorenzo.app.ws.ui.controllers;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -12,12 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
-import org.modelmapper.ModelMapper;
 
 import com.mlorenzo.app.ws.services.UserService;
-import com.mlorenzo.app.ws.shared.dtos.AddressDto;
-import com.mlorenzo.app.ws.shared.dtos.UserDto;
+import com.mlorenzo.app.ws.ui.models.responses.AddressRest;
 import com.mlorenzo.app.ws.ui.models.responses.UserRest;
 
 // Unit Tests
@@ -30,13 +26,6 @@ class UserControllerTest {
 	
 	@Mock
 	UserService userService;
-	
-	// This will allow us to call all the normal methods of the object while still tracking every interaction, just as we would with a mock.
-	// It will still behave in the same way as the normal instance; the only difference is that it will also be instrumented to track all the interactions with it
-	// This way is preparing a modelmapper with default constructor
-	// Ya que queremos usar el ModelMapper real y no una simulación o Mock de él
-	@Spy
-	ModelMapper modelMapper;
 
 	@BeforeEach
 	void setUp() throws Exception {
@@ -46,46 +35,35 @@ class UserControllerTest {
 
 	@Test
 	void testGetUser() {
-		UserDto userDto = getUserDto();
-		
-		when(userService.getUserByUserId(anyString())).thenReturn(userDto);
-		
+		UserRest userRest = getUserRest();
+		when(userService.getUserByUserId(anyString())).thenReturn(userRest);
 		UserRest returnedUserRest = userController.getUser(anyString());
-		
 		assertNotNull(returnedUserRest);
-		assertEquals(userDto.getUserId(), returnedUserRest.getUserId());
-		assertEquals(userDto.getFirstName(), returnedUserRest.getFirstName());
-		assertEquals(userDto.getLastName(), returnedUserRest.getLastName());
-		assertTrue(userDto.getAddresses().size() == returnedUserRest.getAddresses().size());
-		// Además de los Mocks, también podemos interactuar con los Espías(Spies) para verificar datos con Mockito 
-		// Si no indicamos el método estático "times", por defecto es 1 vez
-		verify(modelMapper).map(any(), any());
+		assertEquals(userRest.getUserId(), returnedUserRest.getUserId());
+		assertEquals(userRest.getFirstName(), returnedUserRest.getFirstName());
+		assertEquals(userRest.getLastName(), returnedUserRest.getLastName());
+		assertTrue(userRest.getAddresses().size() == returnedUserRest.getAddresses().size());
 	}
 	
-	private UserDto getUserDto() {
-		UserDto userDto = new UserDto();
-		userDto.setFirstName("Manuel");
-		userDto.setLastName("Lorenzo");
-		userDto.setEmail("test@test.com");
-		userDto.setUserId("fnng67u");
-		userDto.setEncryptedPassword("xxdbf556h");
-		
-		AddressDto shippingAddressDto = new AddressDto();
-		shippingAddressDto.setType("shipping");
-		shippingAddressDto.setCity("Vancouver");
-		shippingAddressDto.setCountry("Canada");
-		shippingAddressDto.setPostalCode("ABC123");
-		shippingAddressDto.setStreetName("123 Street name");
-		
-		AddressDto billingAddressDto = new AddressDto();
-		billingAddressDto.setType("billing");
-		billingAddressDto.setCity("Vancouver");
-		billingAddressDto.setCountry("Canada");
-		billingAddressDto.setPostalCode("ABC123");
-		billingAddressDto.setStreetName("123 Street name");
-		
-		userDto.setAddresses(Arrays.asList(shippingAddressDto, billingAddressDto));
-		
-		return userDto;
+	private UserRest getUserRest() {
+		UserRest userRest = new UserRest();
+		userRest.setFirstName("Manuel");
+		userRest.setLastName("Lorenzo");
+		userRest.setEmail("test@test.com");
+		userRest.setUserId("fnng67u");
+		AddressRest shippingAddressRest = new AddressRest();
+		shippingAddressRest.setType("shipping");
+		shippingAddressRest.setCity("Vancouver");
+		shippingAddressRest.setCountry("Canada");
+		shippingAddressRest.setPostalCode("ABC123");
+		shippingAddressRest.setStreetName("123 Street name");
+		AddressRest billingAddressRest = new AddressRest();
+		billingAddressRest.setType("billing");
+		billingAddressRest.setCity("Vancouver");
+		billingAddressRest.setCountry("Canada");
+		billingAddressRest.setPostalCode("ABC123");
+		billingAddressRest.setStreetName("123 Street name");
+		userRest.setAddresses(Arrays.asList(shippingAddressRest, billingAddressRest));
+		return userRest;
 	}
 }

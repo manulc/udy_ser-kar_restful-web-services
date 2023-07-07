@@ -18,7 +18,5 @@ public class WebConfig implements WebMvcConfigurer {
 			.addMapping("/**") // Si queremos indicar que sólo se aplique CORS a una determinada ruta de la API REST, lo hacemos de esta manera; "/users"
 			.allowedMethods("*") // Si queremos indicar tipos de métodos http determinados, lo hacemos de esta manera; "GET, POST, PUT, DELETE"
 			.allowedOrigins("*"); // Si queremos especificar determinados orígenes, lo hacemos de esta manera; "http://localhost:8083", "http://localhost:8084"
-	}
-
-	
+	}	
 }

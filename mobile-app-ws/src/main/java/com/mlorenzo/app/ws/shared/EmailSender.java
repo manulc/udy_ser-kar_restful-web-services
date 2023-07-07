@@ -9,8 +9,6 @@ import org.springframework.http.MediaType;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
-import com.mlorenzo.app.ws.shared.dtos.UserDto;
-
 @Component
 public class EmailSender {
 	private final String FROM = "jhon.doe@photoapp.com";
@@ -34,9 +32,9 @@ public class EmailSender {
 	@Autowired
 	private JavaMailSender javaMailSender;
 	
-	public void sendVerifyEmail(UserDto userDto) {
-		String htmlContentWithToken = VERIFY_EMAIL_HTMLCONTENT.replace("$tokenValue", userDto.getEmailVerificationToken());
-        sendEmail(FROM, userDto.getEmail(), VERIFY_EMAIL_SUBJECT, htmlContentWithToken);
+	public void sendVerifyEmail(String email, String emailVerificationToken) {
+		String htmlContentWithToken = VERIFY_EMAIL_HTMLCONTENT.replace("$tokenValue", emailVerificationToken);
+        sendEmail(FROM, email, VERIFY_EMAIL_SUBJECT, htmlContentWithToken);
     }
 	
 	public void sendPasswordResetRequestEmail(String firstName, String email, String token) {

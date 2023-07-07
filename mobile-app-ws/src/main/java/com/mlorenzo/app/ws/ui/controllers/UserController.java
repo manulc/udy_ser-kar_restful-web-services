@@ -1,11 +1,7 @@
 package com.mlorenzo.app.ws.ui.controllers;
 
-import java.lang.reflect.Type;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
@@ -30,7 +26,6 @@ import com.mlorenzo.app.ws.services.AddressService;
 import com.mlorenzo.app.ws.services.UserService;
 import com.mlorenzo.app.ws.shared.RequestOperationName;
 import com.mlorenzo.app.ws.shared.RequestOperationStatus;
-import com.mlorenzo.app.ws.shared.dtos.UserDto;
 import com.mlorenzo.app.ws.ui.models.requests.PasswordResetModel;
 import com.mlorenzo.app.ws.ui.models.requests.PasswordResetRequestModel;
 import com.mlorenzo.app.ws.ui.models.requests.UserDetailsRequestModel;
@@ -61,12 +56,8 @@ public class UserController {
 	@Autowired
 	private AddressService addressService;
 	
-	@Autowired
-	private ModelMapper modelMapper;
-	
 	// Nota: Si no se indica el atributo "produces" de las anotaciones @GetMapping, @PostMapping, @PutMapping, etc.., y no existe la cabecera "Accept" en la petición http, por defecto se devuelven los datos en formato Json
 	// Ahora, como si existe el atributo "produces" en los métodos correspondientes y el MediaType XML es el que aparece en primer lugar en la lista, si no se existe la cabecera "Accept" en la petición http, por defecto los datos se devuelven en formato XML
-	
 	
 	// Como esta ruta o endpoint requiere autenticación mediante un token JWT en la cabecera de cada petición http que se haga, usamos esta anotación de Swagger para que añada en su interfaz web un parámetro implícito(un campo de formulario) que nos permita insertar dicho token para poder realizar peticiones http desde su interfaz web
 	@ApiImplicitParams({
@@ -75,14 +66,7 @@ public class UserController {
 	@GetMapping(produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
 	public List<UserRest> getUsers(@RequestParam(defaultValue = "0" ) int page,
 			@RequestParam(defaultValue = "25" ) int limit) {
-		Type listType = new TypeToken<List<UserRest>>() {}.getType();
-		
-		return modelMapper.map(userService.getUsers(page, limit), listType);
-		
-		// Otra alternativa equivalente para realizar el mapeo
-		/* return userService.getUsers(page, limit).stream()
-				.map(userDto -> modelMapper.map(userDto, UserRest.class))
-				.collect(Collectors.toList()); */
+		return userService.getUsers(page, limit);
 	}
 
 	// Como esta ruta o endpoint requiere autenticación mediante un token JWT en la cabecera de cada petición http que se haga, usamos esta anotación de Swagger para que añada en su interfaz web un parámetro implícito(un campo de formulario) que nos permita insertar dicho token para poder realizar peticiones http desde su interfaz web
@@ -96,9 +80,7 @@ public class UserController {
 	@PostAuthorize("hasRole('ADMIN') or returnObject.userId == principal.userEntity.userId") // En este caso, "returnObject" es un objeto de tipo "UserRest" y "principal" es un objeto de tipo "UserPrincipal"
 	@GetMapping(path = "/{userId}", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
 	public UserRest getUser(@PathVariable(value = "userId") String id) {
-		UserDto userDto = userService.getUserByUserId(id);
-		
-		return modelMapper.map(userDto, UserRest.class);
+		return userService.getUserByUserId(id);
 	}
 	
 	// Como esta ruta o endpoint requiere autenticación mediante un token JWT en la cabecera de cada petición http que se haga, usamos esta anotación de Swagger para que añada en su interfaz web un parámetro implícito(un campo de formulario) que nos permita insertar dicho token para poder realizar peticiones http desde su interfaz web
@@ -107,28 +89,19 @@ public class UserController {
 	})
 	@GetMapping(path = "/{userId}/addresses", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
 	public Resources<AddressRest> getUserAddresses(@PathVariable String userId) {
-		List<AddressRest> addresses = addressService.getAddresses(userId).stream()
-				.map(addressDto -> {
-					AddressRest addressRest = modelMapper.map(addressDto, AddressRest.class);
-					
-					// Enlace de Hateoas al propio recurso(withSelfRel)
-					Link addressLink = linkTo(methodOn(UserController.class).getUserAddress(userId, addressRest.getAddressId())).withSelfRel();
-					addressRest.add(addressLink);
-					
-					return addressRest;
-				})
-				.collect(Collectors.toList());
-		
+		List<AddressRest> addresses = addressService.getAddresses(userId);
+		addresses.forEach(addressRest -> {
+			// Enlace de Hateoas al propio recurso(withSelfRel)
+			Link addressLink = linkTo(methodOn(UserController.class).getUserAddress(userId, addressRest.getAddressId())).withSelfRel();
+			addressRest.add(addressLink);
+		});
 		// Enlace de Hateoas al propio recurso(withSelfRel)
 		Link addressLink = linkTo(methodOn(UserController.class).getUserAddresses(userId)).withSelfRel();
-		
 		// Enlace de Hateoas al recurso relacionado con el usuario(withRel)
 		Link userLink = linkTo(methodOn(UserController.class).getUser(userId)).withRel("user");
-		
 		Resources<AddressRest> resources = new Resources<>(addresses);
 		resources.add(userLink);
 		resources.add(addressLink);
-		
 		return resources;
 	}
 	
@@ -182,27 +155,21 @@ public class UserController {
 	public Resource<AddressRest> getUserAddress(@PathVariable String userId, @PathVariable String addressId) {
 		// Enlace de Hateoas al propio recurso(withSelfRel)
 		//Link addressLink = linkTo(UserController.class).slash(userId).slash("addresses").slash(addressId).withSelfRel();
-		
 		// Enlace de Hateoas al propio recurso(withSelfRel)
 		// Para eviar tener que hardcodear valores(En este caso el texto "addresses") en los enlaces, podemos usar el método estático "methodOn" de la siguiente manera
 		Link addressLink = linkTo(methodOn(UserController.class).getUserAddress(userId, addressId)).withSelfRel();
-		
 		// Enlace de Hateoas al recurso relacionado con el usuario(withRel)
 		Link userLink = linkTo(UserController.class).slash(userId).withRel("user");
-		
 		// Enlace de Hateoas al recurso relacionado con el usuario(withRel)
 		//Link addressesLink = linkTo(UserController.class).slash(userId).slash("addresses").withRel("addresses");
-		
 		// Enlace de Hateoas al recurso relacionado con el usuario(withRel)
 		// Para eviar tener que hardcodear valores(En este caso el texto "addresses") en los enlaces, podemos usar el método estático "methodOn" de la siguiente manera
 		Link addressesLink = linkTo(methodOn(UserController.class).getUserAddresses(userId)).withRel("addresses");
-		
-		AddressRest addressRest = modelMapper.map(addressService.getAddress(userId, addressId), AddressRest.class);
+		AddressRest addressRest = addressService.getAddress(userId, addressId);
 		// Añadimos los enlaces de Hateoas
 		addressRest.add(addressLink);
 		addressRest.add(userLink);
 		addressRest.add(addressesLink);
-		
 		return new Resource<>(addressRest);
 	}
 	
@@ -212,13 +179,7 @@ public class UserController {
 			produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE }
 	)
 	public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) {
-		UserDto userDto = modelMapper.map(userDetails, UserDto.class);
-		
-		UserDto createdUser = userService.createUser(userDto);
-		
-		UserRest userRest = modelMapper.map(createdUser, UserRest.class);
-		
-		return userRest;
+		return userService.createUser(userDetails);
 	}
 	
 	// Como esta ruta o endpoint requiere autenticación mediante un token JWT en la cabecera de cada petición http que se haga, usamos esta anotación de Swagger para que añada en su interfaz web un parámetro implícito(un campo de formulario) que nos permita insertar dicho token para poder realizar peticiones http desde su interfaz web
@@ -231,13 +192,7 @@ public class UserController {
 			produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE }
 	)
 	public UserRest updateUser(@RequestBody UserDetailsRequestModel userDetails, @PathVariable String userId) {
-		UserDto userDto = modelMapper.map(userDetails, UserDto.class);
-		
-		UserDto updatedUser = userService.updateUser(userDto, userId);
-		
-		UserRest userRest = modelMapper.map(updatedUser, UserRest.class);
-		
-		return userRest;
+		return userService.updateUser(userDetails, userId);
 	}
 	
 	// Como esta ruta o endpoint requiere autenticación mediante un token JWT en la cabecera de cada petición http que se haga, usamos esta anotación de Swagger para que añada en su interfaz web un parámetro implícito(un campo de formulario) que nos permita insertar dicho token para poder realizar peticiones http desde su interfaz web

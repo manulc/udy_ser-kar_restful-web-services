@@ -12,7 +12,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "password_reset_tokens")
 public class PasswordResetTokenEntity implements Serializable {
-
 	private static final long serialVersionUID = -1923425335307783443L;
 	
 	@Id
@@ -49,5 +48,4 @@ public class PasswordResetTokenEntity implements Serializable {
 	public void setUserDetails(UserEntity userDetails) {
 		this.userDetails = userDetails;
 	}
-	
 }

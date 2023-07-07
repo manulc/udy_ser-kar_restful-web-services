@@ -15,7 +15,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "roles")
 public class RoleEntity implements Serializable {
-
 	private static final long serialVersionUID = 2026872559792123322L;
 
 	@Id
@@ -40,7 +39,6 @@ public class RoleEntity implements Serializable {
 	private Collection<AuthorityEntity> authorities;
 	
 	public RoleEntity() {
-		
 	}
 	
 	public RoleEntity(String name) {

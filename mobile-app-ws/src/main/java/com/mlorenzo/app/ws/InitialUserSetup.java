@@ -43,15 +43,12 @@ public class InitialUserSetup {
 	@EventListener
 	public void onApplicationEvent(ApplicationReadyEvent event) {
 		System.out.println("From Application ready event...");
-		
 		if(userRepository.count() == 0) {
 			AuthorityEntity readAuthority = createAuthority("READ_AUTHORITY");
 			AuthorityEntity writeAuthority = createAuthority("WRITE_AUTHORITY");
 			AuthorityEntity deleteAuthority = createAuthority("DELETE_AUTHORITY");
-			
 			createRole(Roles.ROLE_USER.name(), List.of(readAuthority, writeAuthority));
 			RoleEntity roleAdmin = createRole(Roles.ROLE_ADMIN.name(), List.of(readAuthority, writeAuthority, deleteAuthority));
-		
 			UserEntity adminUser = new UserEntity();
 			adminUser.setFirstName("Manuel");
 			adminUser.setLastName("Lorenzo");
@@ -60,31 +57,26 @@ public class InitialUserSetup {
 			adminUser.setUserId(utils.generateId(30));
 			adminUser.setEncryptedPassword(bCryptPasswordEncoder.encode("12345678"));
 			adminUser.setRoles(Arrays.asList(roleAdmin));
-			
 			userRepository.save(adminUser);
 		}
 	}
 	
 	private AuthorityEntity createAuthority(String name) {
 		AuthorityEntity authorityEntity = authorityRepository.findByName(name);
-		
 		if(authorityEntity == null) {
 			authorityEntity = new AuthorityEntity(name);
 			return authorityRepository.save(authorityEntity);
 		}
-		
 		return authorityEntity;
 	}
 	
 	private RoleEntity createRole(String name, Collection<AuthorityEntity> authorities) {
 		RoleEntity roleEntity = roleRepository.findByName(name);
-		
 		if(roleEntity == null) {
 			roleEntity = new RoleEntity(name);
 			roleEntity.setAuthorities(authorities);
 			return roleRepository.save(roleEntity);
 		}
-		
 		return roleEntity;
 	}
 }

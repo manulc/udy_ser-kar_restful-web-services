@@ -7,7 +7,6 @@ public class ErrorMessage {
 	private String message;
 	
 	public ErrorMessage() {
-		
 	}
 	
 	public ErrorMessage(Date timestamp, String message) {

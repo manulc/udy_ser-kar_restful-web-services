@@ -13,7 +13,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "authorities")
 public class AuthorityEntity implements Serializable {
-
 	private static final long serialVersionUID = -6622446003333759281L;
 	
 	@Id
@@ -28,8 +27,7 @@ public class AuthorityEntity implements Serializable {
 	@ManyToMany(mappedBy = "authorities")
 	private Collection<RoleEntity> roles;
 	
-	public AuthorityEntity( ) {
-		
+	public AuthorityEntity() {
 	}
 	
 	public AuthorityEntity(String name) {

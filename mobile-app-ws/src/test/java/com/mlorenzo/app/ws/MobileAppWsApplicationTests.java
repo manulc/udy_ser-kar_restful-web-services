@@ -77,31 +77,26 @@ class MobileAppWsApplicationTests {
 	void testA() {
 		// Body de la petición http
 		List<Map<String, Object>> userAddresses = new ArrayList<>();
-		
 		Map<String, Object> shippingAddress = new HashMap<>();
 		shippingAddress.put("city", "Vancouver");
 		shippingAddress.put("country", "Canada");
 		shippingAddress.put("streetName", "123 Street name");
 		shippingAddress.put("postalCode", "ABC123");
 		shippingAddress.put("type", "shipping");
-		
 		Map<String, Object> billingAddress = new HashMap<>();
 		billingAddress.put("city", "Vancouver");
 		billingAddress.put("country", "Canada");
 		billingAddress.put("streetName", "123 Street name");
 		billingAddress.put("postalCode", "ABC123");
 		billingAddress.put("type", "billing");
-		
 		userAddresses.add(shippingAddress);
 		userAddresses.add(billingAddress);
-		
 		Map<String, Object> userDetails = new HashMap<>();
 		userDetails.put("firstName", "Manuel");
 		userDetails.put("lastName", "Lorenzo");
 		userDetails.put("email", USER_EMAIL);
 		userDetails.put("password", USER_PASSWORD);
 		userDetails.put("addresses", userAddresses);
-		
 		// Prepara la petición http
 		Response response = given()
 				.contentType(JSON_CONTENT_TYPE)
@@ -117,22 +112,16 @@ class MobileAppWsApplicationTests {
 				// Extrae la respuesta de la petición http
 				.extract()
 				.response();
-		
 		String userId = response.jsonPath().getString("userId");
-
 		assertNotNull(userId);
 		assertTrue(userId.length() == 30);
-		
 		JSONObject responseBodyJson;
 		try {
 			responseBodyJson = new JSONObject(response.body().asString());
 			JSONArray addresses = responseBodyJson.getJSONArray("addresses");
-			
 			assertNotNull(addresses);
 			assertTrue(addresses.length() == 2);
-			
 			String addressId = addresses.getJSONObject(0).getString("addressId");
-			
 			assertNotNull(addressId);
 			assertTrue(addressId.length() == 30);
 		}
@@ -140,11 +129,8 @@ class MobileAppWsApplicationTests {
 			// Falla el test mostrando el mensaje de la excepción
 			fail(e.getMessage());
 		}
-
 		MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
-		
 	    assertEquals(1, receivedMessages.length);
-
 	    String bodyMessage= GreenMailUtil.getBody(receivedMessages[0]);
 	    verifyEmailToken = bodyMessage.substring(bodyMessage.indexOf(VERIFY_EMAIL_TOKEN_PARAM) + VERIFY_EMAIL_TOKEN_PARAM.length(),
 	    		bodyMessage.indexOf("'>"));
@@ -167,9 +153,7 @@ class MobileAppWsApplicationTests {
 				// Extrae la respuesta de la petición http
 				.extract()
 				.response();
-		
 		String result = response.jsonPath().getString("operationResult");
-		
 		assertEquals("SUCCESS", result);
 	}
 	
@@ -179,7 +163,6 @@ class MobileAppWsApplicationTests {
 		Map<String, Object> loginDetails = new HashMap<>();
 		loginDetails.put("email", USER_EMAIL);
 		loginDetails.put("password", USER_PASSWORD);
-		
 		// Prepara la petición http
 		Response response =given()
 				.contentType(JSON_CONTENT_TYPE)
@@ -193,10 +176,8 @@ class MobileAppWsApplicationTests {
 				// Extrae la respuesta de la petición http
 				.extract()
 				.response();
-		
 		authorizationHeader = response.header("Authorization");
 		userId = response.header("UserId");
-		
 		assertNotNull(authorizationHeader);
 		assertNotNull(userId);
 	}
@@ -219,14 +200,12 @@ class MobileAppWsApplicationTests {
 				// Extrae la respuesta de la petición http
 				.extract()
 				.response();
-		
 		String publicUserId = response.jsonPath().getString("userId");
 		String userEmail = response.jsonPath().getString("email");
 		String userFirstName = response.jsonPath().getString("firstName");
 		String userLastName = response.jsonPath().getString("lastName");
 		addresses = response.jsonPath().getList("addresses");
 		String addressId = addresses.get(0).get("addressId");
-		
 		assertNotNull(publicUserId);
 		assertNotNull(userEmail);
 		assertNotNull(userFirstName);
@@ -241,11 +220,9 @@ class MobileAppWsApplicationTests {
 	void testE() {
 		final String newFirstName = "Manu";
 		final String newLastName = "Loren";
-		
 		Map<String, Object> userDetails = new HashMap<>();
 		userDetails.put("firstName", newFirstName);
 		userDetails.put("lastName", newLastName);
-		
 		// Prepara la petición http
 		Response response = given()
 				.contentType(JSON_CONTENT_TYPE)
@@ -263,11 +240,9 @@ class MobileAppWsApplicationTests {
 				// Extrae la respuesta de la petición http
 				.extract()
 				.response();
-		
 		String userFirstName = response.jsonPath().getString("firstName");
 		String userLastName = response.jsonPath().getString("lastName");
 		List<Map<String, String>> storedAddresses = response.jsonPath().getList("addresses");
-		
 		assertNotNull(userFirstName);
 		assertNotNull(userLastName);
 		assertTrue(userFirstName.equals(newFirstName));
@@ -290,7 +265,6 @@ class MobileAppWsApplicationTests {
 			// Comprobaciones de la respuesta http
 			.then()
 			.statusCode(204);
-		
 		// Prepara la petición http
 		given()
 			.pathParam("userId", userId)

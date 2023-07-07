@@ -4,14 +4,15 @@ import java.util.List;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-import com.mlorenzo.app.ws.shared.dtos.UserDto;
+import com.mlorenzo.app.ws.ui.models.requests.UserDetailsRequestModel;
+import com.mlorenzo.app.ws.ui.models.responses.UserRest;
 
 public interface UserService extends UserDetailsService {
-	UserDto createUser(UserDto user);
-	List<UserDto> getUsers(int page, int limit);
-	UserDto getUser(String email);
-	UserDto getUserByUserId(String id);
-	UserDto updateUser(UserDto user, String id);
+	UserRest createUser(UserDetailsRequestModel userDetails);
+	List<UserRest> getUsers(int page, int limit);
+	UserRest getUser(String email);
+	UserRest getUserByUserId(String id);
+	UserRest updateUser(UserDetailsRequestModel userDetails, String id);
 	void deleteUser(String id);
 	boolean verifyEmailToken(String token);
 	boolean requestResetPassword(String email);

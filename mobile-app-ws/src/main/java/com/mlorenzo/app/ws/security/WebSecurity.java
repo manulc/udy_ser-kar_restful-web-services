@@ -89,12 +89,10 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		final CorsConfiguration configuration = new CorsConfiguration();
-		
 		configuration.setAllowedOrigins(List.of("*")); // También podemos especificar los orígenes que se permiten mediante la expresión '"http://localhost:3001', "https://localhost:3002"'
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")); // Podemos usar también la expresión "*" para permitir todos los tipos de método http
 		configuration.setAllowCredentials(true); // Para permitir que haya credenciales(Cookies, cabeceras de autorización, certificados SSL, etc...) en las peticiones http
 		configuration.setAllowedHeaders(Arrays.asList("*")); // También podemos especificar las cabecera que se permiten mediante la expresión '"Authorization", "Cache-Control", "Content-Type"'
-		
 		final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		// Aplicamos esta configuración de CORS a cualquier ruta o endpoint de cualquiera de los controladores REST de esta aplicación
 		source.registerCorsConfiguration("/**", configuration);

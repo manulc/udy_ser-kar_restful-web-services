@@ -18,6 +18,5 @@ public class OperationStatusModel {
 	}
 	public void setOperationResult(RequestOperationStatus operationResult) {
 		this.operationResult = operationResult;
-	}
-	
+	}	
 }
